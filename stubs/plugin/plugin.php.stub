@@ -1,0 +1,20 @@
+<?php
+
+use {{ namespace }}\{{ class }}PluginHook;
+use Zeno\Plugin\Definitions\MenuDefinition;
+
+return [
+    'name' => '{{ title }}',
+    'hook' => {{ class }}PluginHook::class,
+    'menus' => [
+        new MenuDefinition(
+            titleKey: 'plugins.{{ key }}.nav.group',
+            children: [
+                new MenuDefinition(
+                    titleKey: 'plugins.{{ key }}.nav.index',
+                    routeName: '{{ key }}.index',
+                ),
+            ],
+        ),
+    ],
+];

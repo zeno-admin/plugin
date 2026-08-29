@@ -1,0 +1,14 @@
+import './plugin.css';
+import type { ComponentType } from 'react';
+
+type PageLoader = () => Promise<{ default: ComponentType<any> }>;
+
+export default {
+    contract: 1,
+    key: '{{ key }}',
+    pages: { index: () => import('./pages/index') },
+} satisfies {
+    contract: 1;
+    key: string;
+    pages: Record<string, PageLoader>;
+};

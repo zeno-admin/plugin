@@ -1,0 +1,23 @@
+import { Head } from '@inertiajs/react';
+import { translator } from '../support';
+
+type Props = {
+    translations: Record<string, unknown>;
+};
+
+export default function {{ class }}Index({ translations }: Props) {
+    const t = translator(translations, '{{ key }}');
+
+    return (
+        <section data-zeno-plugin="{{ key }}" className="grid gap-4">
+            <Head title={t('title')} />
+
+            <div className="rounded-lg border bg-card p-6 text-card-foreground">
+                <h1 className="text-2xl font-semibold">{t('title')}</h1>
+                <p className="mt-2 text-sm text-muted-foreground">
+                    {t('description')}
+                </p>
+            </div>
+        </section>
+    );
+}

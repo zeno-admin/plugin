@@ -1,0 +1,20 @@
+{
+    "compilerOptions": {
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "bundler",
+        "jsx": "react-jsx",
+        "isolatedModules": true,
+        "strict": true,
+        "noEmit": true,
+        "skipLibCheck": true,
+        "baseUrl": ".",
+        "paths": {
+            "@/*": ["../../../resources/js/*"],
+            "react": ["../../../node_modules/@types/react/index.d.ts"],
+            "react/jsx-runtime": ["../../../node_modules/@types/react/jsx-runtime.d.ts"],
+            "react/jsx-dev-runtime": ["../../../node_modules/@types/react/jsx-dev-runtime.d.ts"]
+        }
+    },
+    "include": ["src/**/*.ts", "src/**/*.tsx"]
+}

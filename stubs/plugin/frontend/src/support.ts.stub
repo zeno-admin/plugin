@@ -1,0 +1,33 @@
+type Replacements = Record<string, string | number>;
+
+export function translator(
+    translations: Record<string, unknown>,
+    plugin: string,
+): (key: string, replacements?: Replacements) => string {
+    const plugins = translations.plugins;
+    const messages =
+        typeof plugins === 'object' && plugins !== null
+            ? (plugins as Record<string, unknown>)[plugin]
+            : undefined;
+
+    return (key, replacements = {}) => {
+        let value: unknown = messages;
+
+        for (const segment of key.split('.')) {
+            value =
+                typeof value === 'object' && value !== null
+                    ? (value as Record<string, unknown>)[segment]
+                    : undefined;
+        }
+
+        if (typeof value !== 'string') {
+            return key;
+        }
+
+        return Object.entries(replacements).reduce(
+            (message, [name, replacement]) =>
+                message.replaceAll(`:${name}`, String(replacement)),
+            value,
+        );
+    };
+}

@@ -1,0 +1,14 @@
+<?php
+
+return [
+    'plugins' => [
+        '{{ key }}' => [
+            'nav' => [
+                'group' => '{{ title }}',
+                'index' => 'Overview',
+            ],
+            'title' => '{{ title }}',
+            'description' => 'Your plugin is ready.',
+        ],
+    ],
+];

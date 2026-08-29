@@ -1,0 +1,30 @@
+import tailwindcss from '@tailwindcss/vite';
+import react from '@vitejs/plugin-react';
+import { defineConfig } from 'vite';
+
+export default defineConfig({
+    plugins: [
+        tailwindcss(),
+        react({ babel: { plugins: ['babel-plugin-react-compiler'] } }),
+    ],
+    build: {
+        lib: {
+            entry: 'src/plugin.ts',
+            formats: ['es'],
+            fileName: () => 'plugin.js',
+            cssFileName: 'plugin',
+        },
+        rolldownOptions: {
+            external: [
+                'react',
+                'react/jsx-runtime',
+                'react/jsx-dev-runtime',
+                'react/compiler-runtime',
+                'react-dom',
+                '@inertiajs/react',
+                /^@\/components\/ui\//,
+            ],
+            output: { chunkFileNames: 'chunks/[name]-[hash].js' },
+        },
+    },
+});

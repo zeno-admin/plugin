@@ -1,0 +1,34 @@
+import js from '@eslint/js';
+import reactHooks from 'eslint-plugin-react-hooks';
+import globals from 'globals';
+import typescript from 'typescript-eslint';
+
+export default [
+    { ignores: ['dist', 'node_modules'] },
+    js.configs.recommended,
+    ...typescript.configs.recommended,
+    reactHooks.configs.flat.recommended,
+    {
+        files: ['src/**/*.{ts,tsx}'],
+        languageOptions: { globals: globals.browser },
+        rules: {
+            '@typescript-eslint/no-explicit-any': 'off',
+            'no-restricted-imports': [
+                'error',
+                {
+                    patterns: [
+                        {
+                            regex: '^@/(?!components/ui/)',
+                            message:
+                                'Plugins may only import Project shadcn components from @/components/ui/.',
+                        },
+                    ],
+                    paths: [
+                        { name: 'react-dom/client' },
+                        { name: '@inertiajs/react/server' },
+                    ],
+                },
+            ],
+        },
+    },
+];

@@ -1,0 +1,62 @@
+# {{ title }}
+
+`{{ package }}` 是一个 Zeno Admin 插件。Composer 安装后，插件 key 为 `{{ key }}`，运行目录为 `plugins/{{ key }}`。
+
+## 本地开发
+
+先构建插件前端。核心发现 `frontend` 目录时会读取已构建的 `dist/plugin.js`。
+
+```bash
+cd packages/{{ key }}/frontend
+npm install
+npm run lint
+npm run types:check
+npm run build
+```
+
+在宿主项目 `composer.json` 的 `repositories` 中加入本地 Path Repository：
+
+```json
+{
+    "type": "path",
+    "url": "packages/{{ key }}",
+    "options": {
+        "symlink": true
+    }
+}
+```
+
+随后在宿主项目根目录安装并初始化插件：
+
+```bash
+composer require {{ package }}:@dev
+php artisan migrate
+npm run build
+```
+
+`migrate` 成功后会导入菜单，执行 `install`、`enable` Hook，并启用插件。访问 `/admin/{{ key }}` 查看页面。
+
+## 开发命令
+
+```bash
+cd packages/{{ key }}/frontend
+npm run dev
+```
+
+修改 PHP 类后执行：
+
+```bash
+composer dump-autoload
+```
+
+修改菜单后执行：
+
+```bash
+php artisan zeno:plugin:sync {{ key }}
+```
+
+内部菜单只声明 Laravel route name。宿主根据 `{{ key }}.index` 生成页面 URL。
+
+## License
+
+[MIT](LICENSE)

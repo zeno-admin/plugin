@@ -1,0 +1,6 @@
+<?php
+
+use {{ namespace }}\Http\Controllers\{{ class }}Controller;
+use Illuminate\Support\Facades\Route;
+
+Route::get('/', [{{ class }}Controller::class, 'index'])->name('index');

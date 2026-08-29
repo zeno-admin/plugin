@@ -1,0 +1,36 @@
+{
+    "name": "zeno/plugin",
+    "description": "Backend plugin runtime for Zeno admin applications.",
+    "type": "library",
+    "license": "MIT",
+    "require": {
+        "php": "^8.3",
+        "composer-runtime-api": "^2.2",
+        "illuminate/console": "^13.0",
+        "illuminate/contracts": "^13.0",
+        "illuminate/database": "^13.0",
+        "illuminate/filesystem": "^13.0",
+        "illuminate/routing": "^13.0",
+        "illuminate/support": "^13.0",
+        "inertiajs/inertia-laravel": "^3.0",
+        "laravel/prompts": "^0.3"
+    },
+    "autoload": {
+        "psr-4": {
+            "Zeno\\Plugin\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Zeno\\Plugin\\Tests\\": "tests/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Zeno\\Plugin\\PluginServiceProvider"
+            ]
+        }
+    },
+    "minimum-stability": "stable"
+}
