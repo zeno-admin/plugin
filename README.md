@@ -31,6 +31,12 @@ php artisan migrate
 php artisan zeno:plugin:make acme/tickets
 ```
 
+创建不包含面板页面或前端依赖的纯后端插件：
+
+```bash
+php artisan zeno:plugin:make acme/tickets --backend-only
+```
+
 省略 package 时，命令通过 Laravel Prompts 询问 Composer package：
 
 ```bash
@@ -64,7 +70,9 @@ packages/tickets/
         └── pages/index.tsx
 ```
 
-先构建插件前端：
+`--backend-only` 生成 Composer manifest、空菜单、五阶段 Hook、中英文语言文件、README 和 License，并省略面板路由、Controller、Inertia 依赖与 `frontend/`。
+
+完整插件先构建插件前端：
 
 ```bash
 cd packages/tickets/frontend
@@ -83,6 +91,8 @@ npm run build
 ```
 
 Composer 会将插件安装到 `plugins/tickets`。成功的 `migrate` 会导入菜单、执行 `install` 和 `enable` Hook；宿主前端构建会加载插件已发布的前端入口。插件模板本身不修改宿主 `composer.json`，也不执行 Composer、npm 或数据库命令。
+
+纯后端插件跳过插件 npm 命令；安装未改变宿主前端或生成路由时，也跳过宿主前端构建。
 
 生成后的插件 README 包含完整的本地加载步骤。
 
