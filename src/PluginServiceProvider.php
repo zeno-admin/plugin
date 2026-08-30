@@ -28,6 +28,8 @@ final class PluginServiceProvider extends ServiceProvider
 
     public function register(): void
     {
+        $this->mergeConfigFrom(__DIR__.'/../config/plugin.php', 'plugin');
+
         $this->app->singleton(PluginRegistry::class);
 
         $this->plugins = $this->app->make(PluginDiscovery::class)->discover();
