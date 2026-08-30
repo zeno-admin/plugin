@@ -16,7 +16,8 @@ use function Laravel\Prompts\text;
 final class PluginMakeCommand extends Command
 {
     protected $signature = 'zeno:plugin:make
-                            {package? : Composer package name, e.g. acme/tickets}';
+                            {package? : Composer package name, e.g. acme/tickets}
+                            {--backend-only : Generate a plugin without frontend or panel UI}';
 
     protected $description = 'Create a Zeno plugin from the default stubs';
 
@@ -52,6 +53,7 @@ final class PluginMakeCommand extends Command
 
         $class = Str::studly($key);
         $namespace = Str::studly($vendor).'\\'.$class;
+        $backendOnly = (bool) $this->option('backend-only');
         $replacements = [
             '{{ package }}' => $package,
             '{{ key }}' => $key,
@@ -63,13 +65,35 @@ final class PluginMakeCommand extends Command
         ];
 
         try {
+            $templates = [];
+
             foreach ($this->files->allFiles($stubs) as $stub) {
-                $relativePath = $this->outputPath($stub->getRelativePathname(), $class);
+                $stubPath = $stub->getRelativePathname();
+
+                if (str_starts_with($stubPath, 'variants/')) {
+                    continue;
+                }
+
+                if ($backendOnly && $this->skipForBackendOnly($stubPath)) {
+                    continue;
+                }
+
+                $templates[] = [$stub, $stubPath];
+            }
+
+            if ($backendOnly) {
+                foreach ($this->files->allFiles($stubs.'/variants/backend') as $stub) {
+                    $templates[] = [$stub, $stub->getRelativePathname()];
+                }
+            }
+
+            foreach ($templates as [$stub, $stubPath]) {
+                $relativePath = $this->outputPath($stubPath, $class);
                 $destination = $target.DIRECTORY_SEPARATOR.str_replace('/', DIRECTORY_SEPARATOR, $relativePath);
                 $contents = $stub->getContents();
                 $fileReplacements = $replacements;
 
-                if ($stub->getRelativePathname() === 'composer.json.stub') {
+                if ($stubPath === 'composer.json.stub') {
                     $contents = str_replace('{{ namespace }}', str_replace('\\', '\\\\', $namespace), $contents);
                     unset($fileReplacements['{{ namespace }}']);
                 }
@@ -139,5 +163,19 @@ final class PluginMakeCommand extends Command
             'src/PluginHook.php.stub' => "src/{$class}PluginHook.php",
             default => Str::beforeLast($stubPath, '.stub'),
         };
+    }
+
+    private function skipForBackendOnly(string $stubPath): bool
+    {
+        return str_starts_with($stubPath, 'frontend/')
+            || in_array($stubPath, [
+                'README.md.stub',
+                'composer.json.stub',
+                'lang/en/admin.php.stub',
+                'lang/zh_CN/admin.php.stub',
+                'plugin.php.stub',
+                'routes/admin.php.stub',
+                'src/Http/Controllers/PluginController.php.stub',
+            ], true);
     }
 }

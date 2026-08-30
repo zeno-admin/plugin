@@ -68,8 +68,48 @@ it('creates a plugin from the fixed stubs', function () {
         ->and(File::get($plugin.'/frontend/src/plugin.ts'))->toContain("key: 'tickets'")
         ->and(File::isDirectory($plugin.'/tests'))->toBeFalse()
         ->and(Artisan::all()['zeno:plugin:make']->getDefinition()->hasOption('path'))->toBeFalse()
+        ->and(Artisan::all()['zeno:plugin:make']->getDefinition()->hasOption('backend-only'))->toBeTrue()
         ->and(Artisan::output())->toContain($plugin.'/README.md')
         ->not->toContain('npm --prefix');
+});
+
+it('creates a backend-only plugin without panel UI', function () {
+    $exitCode = Artisan::call('zeno:plugin:make', [
+        'package' => 'acme/tickets',
+        '--backend-only' => true,
+    ]);
+
+    $plugin = $this->pluginMakeBasePath.'/packages/tickets';
+    $composer = json_decode(File::get($plugin.'/composer.json'), true, flags: JSON_THROW_ON_ERROR);
+    $files = collect(File::allFiles($plugin))
+        ->map(fn (SplFileInfo $file): string => str_replace(
+            DIRECTORY_SEPARATOR,
+            '/',
+            Str::after($file->getPathname(), $plugin.DIRECTORY_SEPARATOR),
+        ))
+        ->sort()
+        ->values()
+        ->all();
+    $manifest = File::get($plugin.'/plugin.php');
+
+    expect($exitCode)->toBe(0)
+        ->and($files)->toBe([
+            'LICENSE',
+            'README.md',
+            'composer.json',
+            'lang/en/admin.php',
+            'lang/zh_CN/admin.php',
+            'plugin.php',
+            'src/TicketsPluginHook.php',
+        ])
+        ->and($composer['name'])->toBe('acme/tickets')
+        ->and($composer['require'])->not->toHaveKey('inertiajs/inertia-laravel')
+        ->and($manifest)->toContain("'menus' => []")
+        ->not->toContain('MenuDefinition')
+        ->and(require $plugin.'/lang/en/admin.php')->toBe([])
+        ->and(require $plugin.'/lang/zh_CN/admin.php')->toBe([])
+        ->and(File::get($plugin.'/README.md'))->toContain('纯后端 Zeno Admin 插件')
+        ->not->toContain('npm run');
 });
 
 it('prompts for a missing package name', function () {
