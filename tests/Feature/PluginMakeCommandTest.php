@@ -8,21 +8,23 @@ use Tests\TestCase;
 uses(TestCase::class);
 
 beforeEach(function () {
-    $this->pluginMakePath = sys_get_temp_dir().DIRECTORY_SEPARATOR.'zeno-plugin-make-'.Str::random(12);
-    File::makeDirectory($this->pluginMakePath);
+    $this->originalBasePath = base_path();
+    $this->pluginMakeBasePath = sys_get_temp_dir().DIRECTORY_SEPARATOR.'zeno-plugin-make-'.Str::random(12);
+    File::makeDirectory($this->pluginMakeBasePath);
+    $this->app->setBasePath($this->pluginMakeBasePath);
 });
 
 afterEach(function () {
-    File::deleteDirectory($this->pluginMakePath);
+    $this->app->setBasePath($this->originalBasePath);
+    File::deleteDirectory($this->pluginMakeBasePath);
 });
 
 it('creates a plugin from the fixed stubs', function () {
     $exitCode = Artisan::call('zeno:plugin:make', [
         'package' => 'acme/tickets',
-        '--path' => $this->pluginMakePath,
     ]);
 
-    $plugin = $this->pluginMakePath.DIRECTORY_SEPARATOR.'tickets';
+    $plugin = $this->pluginMakeBasePath.'/packages/tickets';
     $composer = json_decode(File::get($plugin.'/composer.json'), true, flags: JSON_THROW_ON_ERROR);
     $files = collect(File::allFiles($plugin))
         ->map(fn (SplFileInfo $file): string => str_replace(
@@ -64,25 +66,27 @@ it('creates a plugin from the fixed stubs', function () {
         ->and(File::get($plugin.'/plugin.php'))
         ->toContain('TicketsPluginHook::class', "routeName: 'tickets.index'")
         ->and(File::get($plugin.'/frontend/src/plugin.ts'))->toContain("key: 'tickets'")
-        ->and(File::isDirectory($plugin.'/tests'))->toBeFalse();
+        ->and(File::isDirectory($plugin.'/tests'))->toBeFalse()
+        ->and(Artisan::all()['zeno:plugin:make']->getDefinition()->hasOption('path'))->toBeFalse()
+        ->and(Artisan::output())->toContain($plugin.'/README.md')
+        ->not->toContain('npm --prefix');
 });
 
 it('prompts for a missing package name', function () {
-    $this->artisan('zeno:plugin:make', ['--path' => $this->pluginMakePath])
+    $this->artisan('zeno:plugin:make')
         ->expectsQuestion('Composer package name', 'acme/help-desk')
         ->assertSuccessful();
 
-    expect(File::exists($this->pluginMakePath.'/help-desk/src/HelpDeskPluginHook.php'))->toBeTrue();
+    expect(File::exists($this->pluginMakeBasePath.'/packages/help-desk/src/HelpDeskPluginHook.php'))->toBeTrue();
 });
 
 it('fails when the target directory already exists', function () {
-    $target = $this->pluginMakePath.'/tickets';
-    File::makeDirectory($target);
+    $target = $this->pluginMakeBasePath.'/packages/tickets';
+    File::makeDirectory($target, recursive: true);
     File::put($target.'/keep.txt', 'keep');
 
     $this->artisan('zeno:plugin:make', [
         'package' => 'acme/tickets',
-        '--path' => $this->pluginMakePath,
     ])->assertFailed();
 
     expect(File::get($target.'/keep.txt'))->toBe('keep');
@@ -90,9 +94,8 @@ it('fails when the target directory already exists', function () {
 
 it('requires a package name in non-interactive mode', function () {
     $this->artisan('zeno:plugin:make', [
-        '--path' => $this->pluginMakePath,
         '--no-interaction' => true,
     ])->assertFailed();
 
-    expect(File::directories($this->pluginMakePath))->toBe([]);
+    expect(File::exists($this->pluginMakeBasePath.'/packages'))->toBeFalse();
 });

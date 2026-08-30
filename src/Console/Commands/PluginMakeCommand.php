@@ -16,8 +16,7 @@ use function Laravel\Prompts\text;
 final class PluginMakeCommand extends Command
 {
     protected $signature = 'zeno:plugin:make
-                            {package? : Composer package name, e.g. acme/tickets}
-                            {--path=packages : Base directory for generated plugins}';
+                            {package? : Composer package name, e.g. acme/tickets}';
 
     protected $description = 'Create a Zeno plugin from the default stubs';
 
@@ -35,7 +34,7 @@ final class PluginMakeCommand extends Command
         }
 
         [$vendor, $key] = explode('/', $package, 2);
-        $target = $this->targetPath((string) $this->option('path'), $key);
+        $target = base_path("packages/{$key}");
 
         if ($this->files->exists($target) || is_link($target)) {
             error("Plugin directory [{$target}] already exists.");
@@ -93,7 +92,7 @@ final class PluginMakeCommand extends Command
         }
 
         info("Plugin [{$package}] created successfully.");
-        note($this->nextSteps($package, $target, $key));
+        note("See [{$target}/README.md] for next steps.");
 
         return self::SUCCESS;
     }
@@ -133,16 +132,6 @@ final class PluginMakeCommand extends Command
             : 'Use a lowercase Composer package name such as acme/tickets.';
     }
 
-    private function targetPath(string $path, string $key): string
-    {
-        $isAbsolute = str_starts_with($path, '/')
-            || str_starts_with($path, '\\')
-            || preg_match('/^[A-Za-z]:[\\\\\/]/', $path) === 1;
-
-        return ($isAbsolute ? rtrim($path, '/\\') : base_path(trim($path, '/\\')))
-            .DIRECTORY_SEPARATOR.$key;
-    }
-
     private function outputPath(string $stubPath, string $class): string
     {
         return match ($stubPath) {
@@ -150,21 +139,5 @@ final class PluginMakeCommand extends Command
             'src/PluginHook.php.stub' => "src/{$class}PluginHook.php",
             default => Str::beforeLast($stubPath, '.stub'),
         };
-    }
-
-    private function nextSteps(string $package, string $target, string $key): string
-    {
-        $frontend = $target.DIRECTORY_SEPARATOR.'frontend';
-
-        return <<<TEXT
-Next steps:
-
-npm --prefix "{$frontend}" install
-npm --prefix "{$frontend}" run build
-composer config repositories.{$key} path "{$target}"
-composer require {$package}:@dev
-php artisan migrate
-npm run build
-TEXT;
     }
 }
