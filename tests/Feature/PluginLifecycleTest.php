@@ -230,6 +230,7 @@ it('runs uninstall hooks while preserving menu and business data', function () {
     ]);
 
     $manager->uninstall('acme-lifecycle');
+    $manager->uninstall('acme-lifecycle');
 
     expect(AdminPlugin::query()->findOrFail('acme-lifecycle')->status)->toBe(PluginStatus::Uninstalled)
         ->and(DB::table('admin_menus')->where('title_key', 'plugins.acme-lifecycle.nav.index')->exists())

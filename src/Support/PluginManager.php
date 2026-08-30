@@ -117,6 +117,10 @@ final readonly class PluginManager
         $plugin = $this->plugins->get($key);
         $record = $this->record($key);
 
+        if ($record->status === PluginStatus::Uninstalled) {
+            return;
+        }
+
         if ($record->status === PluginStatus::Enabled) {
             $this->disable($key);
         }
