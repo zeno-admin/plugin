@@ -1,5 +1,5 @@
 {
-    "name": "zeno/plugin",
+    "name": "zenoadmin/plugin",
     "description": "Backend plugin runtime for Zeno admin applications.",
     "type": "library",
     "license": "MIT",
