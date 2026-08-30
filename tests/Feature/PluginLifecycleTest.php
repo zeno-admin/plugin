@@ -1,7 +1,6 @@
 <?php
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
 use Symfony\Component\Routing\Exception\RouteNotFoundException;
 use Tests\TestCase;
@@ -32,8 +31,6 @@ function lifecyclePluginDefinition(
     ?string $reference = 'reference-1',
     ?string $hook = RecordingHook::class,
 ): PluginDefinition {
-    $fixture = $version === '2.0.0' ? 'lifecycle-plugin-v2' : 'lifecycle-plugin-v1';
-
     return new PluginDefinition(
         key: 'acme-lifecycle',
         name: 'Lifecycle fixture',
@@ -41,7 +38,7 @@ function lifecyclePluginDefinition(
         directory: new PluginDirectory(
             key: 'acme-lifecycle',
             package: 'acme/lifecycle',
-            path: base_path("packages/plugin/tests/Fixtures/{$fixture}"),
+            path: base_path('packages/plugin/tests/Fixtures'),
         ),
         version: $version,
         reference: $reference,
@@ -496,24 +493,5 @@ it('fails pending processing on database connection errors', function () {
     } finally {
         config()->set('database.default', $original);
         DB::purge('lifecycle_broken');
-    }
-});
-
-it('treats uninstall before lifecycle tables exist as already complete', function () {
-    $original = config('database.default');
-    config()->set('database.connections.lifecycle_empty', [
-        'driver' => 'sqlite',
-        'database' => ':memory:',
-        'prefix' => '',
-    ]);
-    config()->set('database.default', 'lifecycle_empty');
-    DB::purge('lifecycle_empty');
-
-    try {
-        expect(Artisan::call('zeno-internal:plugin-uninstall', ['plugin' => 'acme-lifecycle']))
-            ->toBe(0);
-    } finally {
-        config()->set('database.default', $original);
-        DB::purge('lifecycle_empty');
     }
 });

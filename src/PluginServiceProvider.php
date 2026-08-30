@@ -65,13 +65,15 @@ final class PluginServiceProvider extends ServiceProvider
                 $this->loadTranslationsFrom($plugin->directory->translationPath(), $plugin->key);
             }
 
-            foreach ($plugin->migrationPaths() as $path) {
-                $this->loadMigrationsFrom($path);
+            $migrationPath = $plugin->directory->migrationPath();
+
+            if (is_dir($migrationPath)) {
+                $this->loadMigrationsFrom($migrationPath);
             }
 
             $routes->register($plugin);
 
-            if ($plugin->hasFrontend()) {
+            if ($plugin->directory->hasFrontend()) {
                 $withoutSsr[] = "{$adminPrefix}/{$plugin->key}";
                 $withoutSsr[] = "{$adminPrefix}/{$plugin->key}/*";
             }

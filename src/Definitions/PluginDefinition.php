@@ -35,11 +35,6 @@ final readonly class PluginDefinition
         }
     }
 
-    public function hasFrontend(): bool
-    {
-        return $this->directory->hasFrontend();
-    }
-
     public function hasTranslations(): bool
     {
         return is_dir($this->directory->translationPath());
@@ -48,11 +43,5 @@ final readonly class PluginDefinition
     public function translationNamespace(): ?string
     {
         return $this->hasTranslations() ? $this->key : null;
-    }
-
-    /** @return list<string> */
-    public function migrationPaths(): array
-    {
-        return is_dir($this->directory->migrationPath()) ? [$this->directory->migrationPath()] : [];
     }
 }

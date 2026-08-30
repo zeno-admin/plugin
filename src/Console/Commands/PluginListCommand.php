@@ -3,7 +3,6 @@
 namespace Zeno\Plugin\Console\Commands;
 
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\Schema;
 use Zeno\Plugin\Models\AdminPlugin;
 use Zeno\Plugin\Support\PluginRegistry;
 

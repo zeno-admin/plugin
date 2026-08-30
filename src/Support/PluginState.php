@@ -18,13 +18,11 @@ final class PluginState
     /** @return list<string> */
     public function enabledKeys(): array
     {
-        return array_values(
-            AdminPlugin::query()
-                ->where('status', PluginStatus::Enabled->value)
-                ->orderBy('key')
-                ->pluck('key')
-                ->map(fn (mixed $key): string => (string) $key)
-                ->all(),
-        );
+        return array_values(AdminPlugin::query()
+            ->where('status', PluginStatus::Enabled->value)
+            ->orderBy('key')
+            ->pluck('key')
+            ->map(fn (mixed $key): string => (string) $key)
+            ->all());
     }
 }
