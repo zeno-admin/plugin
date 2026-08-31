@@ -13,7 +13,8 @@
         "illuminate/routing": "^13.0",
         "illuminate/support": "^13.0",
         "inertiajs/inertia-laravel": "^3.0",
-        "laravel/prompts": "^0.3"
+        "laravel/prompts": "^0.3",
+        "zenoadmin/plugin-installer": "dev-main"
     },
     "autoload": {
         "psr-4": {
