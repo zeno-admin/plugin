@@ -20,6 +20,7 @@ use Zeno\Plugin\Middleware\EnsurePluginEnabled;
 use Zeno\Plugin\Support\AdminRouteRegistrar;
 use Zeno\Plugin\Support\PluginOperationProcessor;
 use Zeno\Plugin\Support\PluginRegistry;
+use Zeno\Plugin\Support\PluginState;
 
 final class PluginServiceProvider extends ServiceProvider
 {
@@ -48,8 +49,17 @@ final class PluginServiceProvider extends ServiceProvider
         }
     }
 
-    public function boot(Router $router, PluginRegistry $registry, AdminRouteRegistrar $routes): void
-    {
+    public function boot(
+        Router $router,
+        PluginRegistry $registry,
+        AdminRouteRegistrar $routes,
+        PluginState $state,
+    ): void {
+        Inertia::share(
+            'enabledPlugins',
+            fn (): array => $this->isAdminRequest() ? $state->enabledKeys() : [],
+        );
+
         $router->aliasMiddleware('plugin.enabled', EnsurePluginEnabled::class);
         $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
 
@@ -106,5 +116,17 @@ final class PluginServiceProvider extends ServiceProvider
                 PluginUninstallInternalCommand::class,
             ]);
         }
+    }
+
+    /**
+     * 判断当前请求是否属于配置的后台命名路由空间。
+     */
+    private function isAdminRequest(): bool
+    {
+        $name = request()->route()?->getName();
+        $prefixConfig = config()->string('plugin.route.name_prefix_config');
+        $prefix = trim(config()->string($prefixConfig), '.');
+
+        return is_string($name) && str_starts_with($name, "{$prefix}.");
     }
 }
