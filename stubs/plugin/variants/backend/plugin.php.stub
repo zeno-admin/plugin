@@ -1,0 +1,9 @@
+<?php
+
+use {{ namespace }}\{{ class }}PluginHook;
+
+return [
+    'name' => '{{ title }}',
+    'hook' => {{ class }}PluginHook::class,
+    'menus' => [],
+];

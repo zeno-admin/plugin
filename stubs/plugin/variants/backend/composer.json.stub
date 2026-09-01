@@ -1,0 +1,19 @@
+{
+    "$schema": "https://getcomposer.org/schema.json",
+    "name": "{{ package }}",
+    "description": "{{ title }} backend plugin for Zeno Admin.",
+    "type": "zeno-plugin",
+    "license": "MIT",
+    "require": {
+        "php": "^8.3",
+        "laravel/framework": "^13.0",
+        "zeno/plugin": "^1.0 || dev-main",
+        "zeno/plugin-installer": "^1.0 || dev-main"
+    },
+    "autoload": {
+        "psr-4": {
+            "{{ namespace }}\\": "src/"
+        }
+    },
+    "minimum-stability": "stable"
+}
