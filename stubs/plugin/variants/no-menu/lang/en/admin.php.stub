@@ -1,0 +1,10 @@
+<?php
+
+return [
+    'plugins' => [
+        '{{ key }}' => [
+            'title' => '{{ title }}',
+            'description' => 'Your plugin is ready.',
+        ],
+    ],
+];

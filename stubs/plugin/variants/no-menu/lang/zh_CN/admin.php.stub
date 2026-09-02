@@ -1,0 +1,10 @@
+<?php
+
+return [
+    'plugins' => [
+        '{{ key }}' => [
+            'title' => '{{ title }}',
+            'description' => '插件已经加载完成。',
+        ],
+    ],
+];

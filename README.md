@@ -37,6 +37,12 @@ php artisan zeno:plugin:make acme/tickets
 php artisan zeno:plugin:make acme/tickets --backend-only
 ```
 
+创建保留完整页面和前端、但不加入后台导航菜单的插件：
+
+```bash
+php artisan zeno:plugin:make acme/tickets --no-menu
+```
+
 省略 package 时，命令通过 Laravel Prompts 询问 Composer package：
 
 ```bash
@@ -71,6 +77,8 @@ packages/tickets/
 ```
 
 `--backend-only` 生成 Composer manifest、空菜单、五阶段 Hook、中英文语言文件、README 和 License，并省略面板路由、Controller、Inertia 依赖与 `frontend/`。
+
+`--no-menu` 保留完整插件的页面、路由、Controller、Inertia 依赖与前端，仅生成空菜单并省略 `menu_titles` 翻译。
 
 完整插件先构建插件前端：
 

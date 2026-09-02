@@ -69,8 +69,38 @@ it('creates a plugin from the fixed stubs', function () {
         ->and(File::isDirectory($plugin.'/tests'))->toBeFalse()
         ->and(Artisan::all()['zeno:plugin:make']->getDefinition()->hasOption('path'))->toBeFalse()
         ->and(Artisan::all()['zeno:plugin:make']->getDefinition()->hasOption('backend-only'))->toBeTrue()
+        ->and(Artisan::all()['zeno:plugin:make']->getDefinition()->hasOption('no-menu'))->toBeTrue()
         ->and(Artisan::output())->toContain($plugin.'/README.md')
         ->not->toContain('npm --prefix');
+});
+
+it('creates a full plugin without navigation menu', function () {
+    $exitCode = Artisan::call('zeno:plugin:make', [
+        'package' => 'acme/tickets',
+        '--no-menu' => true,
+    ]);
+
+    $plugin = $this->pluginMakeBasePath.'/packages/tickets';
+    $composer = json_decode(File::get($plugin.'/composer.json'), true, flags: JSON_THROW_ON_ERROR);
+    $manifest = File::get($plugin.'/plugin.php');
+    $english = require $plugin.'/lang/en/admin.php';
+    $chinese = require $plugin.'/lang/zh_CN/admin.php';
+
+    expect($exitCode)->toBe(0)
+        ->and($composer['require'])->toHaveKey('inertiajs/inertia-laravel')
+        ->and($manifest)->toContain("'menus' => []")
+        ->not->toContain('MenuDefinition')
+        ->and($english['plugins']['tickets'])->toBe([
+            'title' => 'Tickets',
+            'description' => 'Your plugin is ready.',
+        ])
+        ->and($chinese['plugins']['tickets'])->toBe([
+            'title' => 'Tickets',
+            'description' => '插件已经加载完成。',
+        ])
+        ->and(File::exists($plugin.'/routes/admin.php'))->toBeTrue()
+        ->and(File::exists($plugin.'/src/Http/Controllers/TicketsController.php'))->toBeTrue()
+        ->and(File::exists($plugin.'/frontend/src/pages/index.tsx'))->toBeTrue();
 });
 
 it('creates a backend-only plugin without panel UI', function () {

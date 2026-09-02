@@ -17,7 +17,8 @@ final class PluginMakeCommand extends Command
 {
     protected $signature = 'zeno:plugin:make
                             {package? : Composer package name, e.g. acme/tickets}
-                            {--backend-only : Generate a plugin without frontend or panel UI}';
+                            {--backend-only : Generate a plugin without frontend or panel UI}
+                            {--no-menu : Generate a full plugin without navigation menu}';
 
     protected $description = 'Create a Zeno plugin from the default stubs';
 
@@ -54,6 +55,7 @@ final class PluginMakeCommand extends Command
         $class = Str::studly($key);
         $namespace = Str::studly($vendor).'\\'.$class;
         $backendOnly = (bool) $this->option('backend-only');
+        $noMenu = (bool) $this->option('no-menu');
         $replacements = [
             '{{ package }}' => $package,
             '{{ key }}' => $key,
@@ -78,11 +80,19 @@ final class PluginMakeCommand extends Command
                     continue;
                 }
 
+                if (! $backendOnly && $noMenu && $this->replaceForNoMenu($stubPath)) {
+                    continue;
+                }
+
                 $templates[] = [$stub, $stubPath];
             }
 
             if ($backendOnly) {
                 foreach ($this->files->allFiles($stubs.'/variants/backend') as $stub) {
+                    $templates[] = [$stub, $stub->getRelativePathname()];
+                }
+            } elseif ($noMenu) {
+                foreach ($this->files->allFiles($stubs.'/variants/no-menu') as $stub) {
                     $templates[] = [$stub, $stub->getRelativePathname()];
                 }
             }
@@ -177,5 +187,14 @@ final class PluginMakeCommand extends Command
                 'routes/admin.php.stub',
                 'src/Http/Controllers/PluginController.php.stub',
             ], true);
+    }
+
+    private function replaceForNoMenu(string $stubPath): bool
+    {
+        return in_array($stubPath, [
+            'plugin.php.stub',
+            'lang/en/admin.php.stub',
+            'lang/zh_CN/admin.php.stub',
+        ], true);
     }
 }
