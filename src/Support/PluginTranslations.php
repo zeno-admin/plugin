@@ -22,7 +22,7 @@ final readonly class PluginTranslations
      */
     public function resolve(Request $request, array $global, Closure $loadProjectPage): array
     {
-        $translations = $this->withPluginNavigation($global);
+        $translations = $this->withPluginMenuTitles($global);
         $businessName = Str::of((string) $request->route()?->getName())
             ->after($this->routeNamePrefix().'.');
         $pluginKey = $businessName->before('.')->toString();
@@ -50,7 +50,7 @@ final readonly class PluginTranslations
      * @param  array<string, mixed>  $translations
      * @return array<string, mixed>
      */
-    private function withPluginNavigation(array $translations): array
+    private function withPluginMenuTitles(array $translations): array
     {
         foreach ($this->state->enabledKeys() as $pluginKey) {
             if (! $this->plugins->has($pluginKey)) {
@@ -63,10 +63,10 @@ final readonly class PluginTranslations
                 continue;
             }
 
-            $navigation = $this->translator->get("{$namespace}::admin.plugins.{$pluginKey}.nav");
+            $menuTitles = $this->translator->get("{$namespace}::admin.plugins.{$pluginKey}.menu_titles");
 
-            if (is_array($navigation)) {
-                $translations['plugins'][$pluginKey]['nav'] = $navigation;
+            if (is_array($menuTitles)) {
+                $translations['plugins'][$pluginKey]['menu_titles'] = $menuTitles;
             }
         }
 

@@ -154,11 +154,11 @@ return [
     'hook' => \Acme\IncidentDesk\IncidentDeskHook::class,
     'menus' => [
         new MenuDefinition(
-            titleKey: 'plugins.incident-desk.nav.group',
+            titleKey: 'plugins.incident-desk.menu_titles.groups.root',
             icon: 'shield_alert',
             children: [
                 new MenuDefinition(
-                    titleKey: 'plugins.incident-desk.nav.index',
+                    titleKey: 'plugins.incident-desk.menu_titles.links.index',
                     routeName: 'incident-desk.index',
                     icon: 'activity',
                 ),

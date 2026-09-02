@@ -77,8 +77,11 @@ final class PluginManifestLoader
                     throw new InvalidPluginException('Plugin manifest menus must contain only MenuDefinition objects.');
                 }
 
-                if (! str_starts_with($menu->titleKey, "plugins.{$pluginKey}.")) {
-                    throw new InvalidPluginException("Plugin menu title key must start with [plugins.{$pluginKey}.].");
+                $isLink = $menu->routeName !== null || $menu->url !== null;
+                $titlePrefix = "plugins.{$pluginKey}.menu_titles.".($isLink ? 'links.' : 'groups.');
+
+                if (! str_starts_with($menu->titleKey, $titlePrefix) || $menu->titleKey === $titlePrefix) {
+                    throw new InvalidPluginException("Plugin menu title key must start with [{$titlePrefix}].");
                 }
 
                 if ($menu->routeName !== null && ! str_starts_with($menu->routeName, "{$pluginKey}.")) {

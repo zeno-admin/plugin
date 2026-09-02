@@ -3,9 +3,13 @@
 return [
     'plugins' => [
         '{{ key }}' => [
-            'nav' => [
-                'group' => '{{ title }}',
-                'index' => '概览',
+            'menu_titles' => [
+                'groups' => [
+                    'root' => '{{ title }}',
+                ],
+                'links' => [
+                    'index' => '概览',
+                ],
             ],
             'title' => '{{ title }}',
             'description' => '插件已经加载完成。',

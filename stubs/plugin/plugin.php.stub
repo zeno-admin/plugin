@@ -8,10 +8,10 @@ return [
     'hook' => {{ class }}PluginHook::class,
     'menus' => [
         new MenuDefinition(
-            titleKey: 'plugins.{{ key }}.nav.group',
+            titleKey: 'plugins.{{ key }}.menu_titles.groups.root',
             children: [
                 new MenuDefinition(
-                    titleKey: 'plugins.{{ key }}.nav.index',
+                    titleKey: 'plugins.{{ key }}.menu_titles.links.index',
                     routeName: '{{ key }}.index',
                 ),
             ],

@@ -2,17 +2,15 @@
 
 return [
     'plugins' => [
-        '{{ key }}' => [
+        'menu-title-plugin' => [
             'menu_titles' => [
                 'groups' => [
-                    'root' => '{{ title }}',
+                    'root' => 'Menu Title Plugin',
                 ],
                 'links' => [
                     'index' => 'Overview',
                 ],
             ],
-            'title' => '{{ title }}',
-            'description' => 'Your plugin is ready.',
         ],
     ],
 ];

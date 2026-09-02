@@ -44,7 +44,7 @@ function lifecyclePluginDefinition(
         reference: $reference,
         hook: $hook,
         menus: [new MenuDefinition(
-            titleKey: 'plugins.acme-lifecycle.nav.index',
+            titleKey: 'plugins.acme-lifecycle.menu_titles.links.index',
             url: 'https://example.com/acme-lifecycle',
         )],
     );
@@ -80,7 +80,7 @@ it('installs and enables a plugin through its hook', function () {
         ->and($installed->version)->toBe('1.0.0')
         ->and($installed->reference)->toBe('reference-1')
         ->and($this->recorder->events)->toBe(['install'])
-        ->and(DB::table('admin_menus')->where('title_key', 'plugins.acme-lifecycle.nav.index')->exists())
+        ->and(DB::table('admin_menus')->where('title_key', 'plugins.acme-lifecycle.menu_titles.links.index')->exists())
         ->toBeTrue();
 
     expect($manager->enable('acme-lifecycle')->status)->toBe(PluginStatus::Enabled)
@@ -102,7 +102,7 @@ it('keeps install retryable when the install hook fails', function () {
     expect(fn () => $manager->install('acme-lifecycle'))
         ->toThrow(PluginHookException::class, 'install hook failed')
         ->and(AdminPlugin::query()->find('acme-lifecycle'))->toBeNull()
-        ->and(DB::table('admin_menus')->where('title_key', 'plugins.acme-lifecycle.nav.index')->exists())
+        ->and(DB::table('admin_menus')->where('title_key', 'plugins.acme-lifecycle.menu_titles.links.index')->exists())
         ->toBeTrue();
 
     $this->recorder->failOn = null;
@@ -122,7 +122,7 @@ it('does not run install hooks or create state when menu import fails', function
         reference: $plugin->reference,
         hook: $plugin->hook,
         menus: [new MenuDefinition(
-            titleKey: 'plugins.acme-lifecycle.nav.missing',
+            titleKey: 'plugins.acme-lifecycle.menu_titles.links.missing',
             routeName: 'acme-lifecycle.missing',
         )],
     );
@@ -233,7 +233,7 @@ it('runs uninstall hooks while preserving menu and business data', function () {
     $manager->uninstall('acme-lifecycle');
 
     expect(AdminPlugin::query()->findOrFail('acme-lifecycle')->status)->toBe(PluginStatus::Uninstalled)
-        ->and(DB::table('admin_menus')->where('title_key', 'plugins.acme-lifecycle.nav.index')->exists())
+        ->and(DB::table('admin_menus')->where('title_key', 'plugins.acme-lifecycle.menu_titles.links.index')->exists())
         ->toBeTrue()
         ->and(DB::table('cache')->where('key', 'acme-lifecycle-business-data')->value('value'))
         ->toBe('preserved')
